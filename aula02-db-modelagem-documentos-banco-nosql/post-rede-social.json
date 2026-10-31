@@ -1,0 +1,22 @@
+{
+    "autor":"Leila Santos",
+    "dataPostagem": "2026-10-18",
+    "texto":"Vamos que vamos! 13",
+    "curtidas":[
+        {"autor":"Pedro Barbosa", 
+        "reacao":"curtiu"},
+
+        {"autor":"Neila Larissa", 
+        "reacao":"amei"},
+        
+        {"autor":"Benedito Teixeira", 
+        "reacao":"amei"}
+    ],
+"comentarios":[
+    {"autor":"Neila Larissa", 
+    "comentario": "Vamos!"},
+
+    {"autor":"Pedro Barbosa", 
+    "comentario":"#BoraLula"}
+]
+}
