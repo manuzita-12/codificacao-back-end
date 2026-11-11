@@ -9,20 +9,38 @@ import { Aluno, AlunoDoc } from "./schemas/aluno.schema.js";
 export class AlunosService {
     constructor(@InjectModel(Aluno.name) private alunoModel: Model<AlunoDoc>){}
 
-    //CRUD
-    // C - create (criar)
-    // R - Read (ler/consultar)
-    // U - Update ( atualizar)
-    // D - Delete ( apagar)
+    //?CRUD
+    //? C - create (criar)
+    //? R - Read (ler/consultar)
+    //? U - Update ( atualizar)
+    //? D - Delete ( apagar)
 
     async create(createAlunoDto: CreateAlunoDto): Promise<Aluno>{
         const createAluno = new this.alunoModel(createAlunoDto);
         return createAluno.save();
     }
 
-    async findAll(): Promise<Aluno[]>{
-        return this.alunoModel.find().exec();
-    }
+    // async findAll(): Promise<Aluno[]>{
+    //     return this.alunoModel.find().exec();
+    // }
+
+    //? Método para buscar os alunos com paginação
+    async findPage(page: number, limit: number){
+        const skip = (page - 1) * limit;
+        const [data, total] = await Promise.all([
+            this.alunoModel.find().skip(skip).limit(limit).exec(),
+            this.alunoModel.countDocuments().exec(),
+        ]);
+        return {
+            data,
+            meta:{
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
+            },
+        };
+    } 
 
     async findOne(id: string): Promise<Aluno> {
         const aluno = await this.alunoModel.findById(id).exec();
