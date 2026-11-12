@@ -12,20 +12,23 @@ Nesta aplicação, foram implementadas e aprimoradas as seguintes funcionalidade
 * **Persistência de Dados com MongoDB**: Conexão à base de dados NoSQL utilizando o `@nestjs/mongoose` e manipulação de documentos via Mongoose.
 * **Operações CRUD Completas**: 
   * `POST /alunos`: Criar um novo registo de aluno.
-  * `GET /alunos`: Listar alunos com suporte a paginação e filtros opcionais.
+  * `GET /alunos`: Listar alunos com suporte a paginação, filtros opcionais e ordenação.
   * `GET /alunos/:id`: Consultar um aluno específico pelo seu ID (com tratamento de exceção `NotFoundException`).
   * `PATCH /alunos/:id`: Atualizar parcialmente os dados de um aluno.
   * `DELETE /alunos/:id`: Remover um aluno da base de dados.
-* **Paginação e Filtros de Busca (Atualizado na aula de hoje)**:
+* **Paginação, Filtros de Busca e Ordenação (Atualizado na aula de hoje)**:
   * **Paginação**: Suporte a parâmetros de consulta (*query parameters*) `page` (padrão: 1) e `limit` (padrão: 10).
   * **Filtros Opcionais**:
-    * `nome`: Permite filtrar a lista de alunos por nome/sobrenome (ex: `?nome=Costa`).
-    * `curso`: Permite filtrar alunos vinculados a um curso específico (ex: `?curso=Administração`).
-  * **Filtros Combinados**: Possibilidade de combinar filtros de texto com paginação na mesma consulta (ex: `?nome=Ana&curso=Psicologia&page=1&limit=5`).
-  * **Resposta Estruturada**: Retorno com a lista filtrada (`data`) e metadados atualizados (`meta`: `total`, `page`, `limit`, `totalPages`).
+    * `nome`: Permite filtrar a lista de alunos por nome/sobrenome com busca insensível a maiúsculas/minúsculas via Regex (ex: `?nome=Jamilly`).
+    * `curso`: Permite filtrar alunos vinculados a um curso específico (ex: `?curso=Engenharia Civil`).
+  * **Ordenação Dinâmica**:
+    * `orderBy`: Define o campo pelo qual os resultados serão ordenados (ex: `nome`, `idade`, `matricula`, `curso`).
+    * `orderDirection`: Define a direção da ordenação, aceitando `asc` (crescente, padrão) ou `desc` (decrescente) (ex: `?orderBy=nome&orderDirection=asc`).
+  * **Consultas Combinadas**: Possibilidade de combinar filtros de texto, ordenação e paginação na mesma requisição (ex: `?nome=Ana&curso=Psicologia&orderBy=idade&orderDirection=desc&page=1&limit=5`).
+  * **Resposta Estruturada**: Retorno com a lista filtrada/ordenada (`data`) e metadados atualizados (`meta`: `total`, `page`, `limit`, `totalPages`).
 * **Documentação Interativa com Swagger**:
   * Configuração da OpenAPI/Swagger UI no endpoint `/api`.
-  * Mapeamento detalhado dos *query parameters* (`page`, `limit`, `nome`, `curso`) via decorador `@ApiQuery`.
+  * Mapeamento detalhado dos *query parameters* (`page`, `limit`, `nome`, `curso`, `orderBy`, `orderDirection`) via decorador `@ApiQuery` (incluindo suporte a `enum` para `orderDirection`).
   * Documentação detalhada dos endpoints, códigos de resposta HTTP (200, 201, 400, 404, 500) e exemplos de payload via `@nestjs/swagger` e `@ApiProperty`.
 * **Validação e Transformação de Dados (DTOs)**: 
   * Utilização das bibliotecas `class-validator` e `class-transformer`.
