@@ -37,15 +37,13 @@ export class AlunosController {
     //     status: 404,
     //     description: 'Nenhum aluno encontrado',
     // })
-
-
     // findAll(){
     //     return this.alunosService.findAll();
     // }
 
     @Get()
       @ApiOperation({
-        summary: 'Listar alunos com paginação',
+        summary: 'Listar alunos com paginação e filtros opcionais',
     })
     @ApiResponse({
         status: 200,
@@ -71,10 +69,23 @@ export class AlunosController {
         type: Number,
         description: 'Número de itens por página (padrãio: 10)',
     })
+    @ApiQuery({
+        name:'nome',
+        required: false,
+        type: String,
+        description: 'Filtrar alunos pelo nome (Ex: Jamilly)',
+    })
+    @ApiQuery({
+        name:'curso',
+        required: false,
+        type: String,
+        description: 'Filtrar alunos pelo curso (Ex: Engenharia Civil)',
+    })
     findPage(@Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-              @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number){
-                return this.alunosService.findPage(page, limit);
-              }
+              @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+              @Query('nome') nome?: string,
+              @Query('curso') curso?: string,){
+                return this.alunosService.findPage(page, limit, nome, curso);}
 
     @Get(':id')
     @ApiOperation({
