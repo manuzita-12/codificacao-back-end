@@ -9,7 +9,11 @@ Esta documentação descreve a estrutura, o conteúdo, as ferramentas e o guia d
 Nesta aplicação, foram implementadas e aprimoradas as seguintes funcionalidades e conceitos:
 
 * **Arquitetura Modular em NestJS**: Organização do código em módulos (`AlunosModule`), controladores (`AlunosController`), serviços (`AlunosService`) e esquemas de dados (`AlunoSchema`).
-* **Persistência de Dados com MongoDB**: Conexão à base de dados NoSQL utilizando o `@nestjs/mongoose` e manipulação de documentos via Mongoose (`escola_dbn` / collection `alunos`).
+* **Configuração e Validação de Variáveis de Ambiente**:
+  * Gerenciamento centralizado de variáveis de ambiente com `@nestjs/config` (`ConfigModule`) e esquema de validação em `src/config/env.config.ts`.
+  * Validação automática na inicialização da aplicação (*fail-fast*), garantindo que variáveis obrigatórias (`DATABASE_URI` e `JWT_SECRET`) estejam definidas e que `NODE_ENV` aceite apenas valores válidos (`development`, `production` ou `test`).
+  * Disponibilização de arquivo modelo `.env.exemplo` para facilitar a configuração em novos ambientes.
+* **Persistência de Dados com MongoDB**: Conexão dinâmica à base de dados NoSQL utilizando `@nestjs/mongoose` com `MongooseModule.forRootAsync` (lendo `DATABASE_URI` do ambiente) e manipulação de documentos via Mongoose (`escola_dbn` / collection `alunos`).
 * **Operações CRUD Completas**: 
   * `POST /alunos`: Criar um novo registo de aluno.
   * `GET /alunos`: Listar alunos com suporte a paginação, filtros opcionais e ordenação.
@@ -48,26 +52,29 @@ Nesta aplicação, foram implementadas e aprimoradas as seguintes funcionalidade
 ## 🛠️ Tecnologias e Ferramentas Utilizadas
 
 * **[Node.js](https://nodejs.org/)** & **[TypeScript](https://www.typescriptlang.org/)**: Base de execução e linguagem tipada do projeto.
-* **[NestJS](https://nestjs.com/)**: Framework backend progressivo e modular.
+* **[NestJS](https://nestjs.com/)**: Framework backend progressivo e modular (`@nestjs/common`, `@nestjs/core`, `@nestjs/config`).
 * **[MongoDB](https://www.mongodb.com/) & Mongoose**: Banco de dados NoSQL e ODM para modelagem de dados (`timestamps`, índices únicos) e tratamento de `MongoServerError`.
 * **[Faker.js](https://fakerjs.dev/) (`@faker-js/faker`) & [tsx](https://tsx.is/)**: Geração de massa de dados realista em português e execução direta de scripts TypeScript.
 * **[Swagger / OpenAPI](https://swagger.io/)**: Documentação interativa e testes diretos dos endpoints da API (`@nestjs/swagger`).
 * **Class-Validator & Class-Transformer**: Validação e transformação declarativa de requisições.
+* **[Vitest](https://vitest.dev/)**: Framework de testes unitários e ponta a ponta (`vitest.config.ts` / `vitest.config.e2e.ts`).
 * **Postman / Insomnia**: Clientes HTTP utilizados para testes de integração das rotas.
 * **MongoDB Compass**: Interface gráfica para gestão e inspeção dos dados no banco `escola_dbn`.
 
 ---
 
-## 🚀 Como Executar o Projeto
+## 📂 Estrutura do Projeto
 
-Siga os passos abaixo para configurar e executar a aplicação no seu ambiente local:
-
-### 1. Pré-requisitos
-Certifique-se de que tem instalado na sua máquina:
-* **Node.js** (versão LTS recomendada)
-* **MongoDB** em execução localmente (porta padrão `27017` ou URI configurada no `AppModule`)
-
-### 2. Instalação das Dependências
-Abra o terminal na pasta raiz do projeto (`escola-api`) e execute:
-```bash
-npm install
+```text
+escola-api/
+├── src/
+│   ├── alunos/             # Módulo, controller, service, DTOs e schema de alunos
+│   ├── config/
+│   │   └── env.config.ts   # Validação e tipagem das variáveis de ambiente
+│   ├── app.module.ts       # Módulo raiz da aplicação
+│   ├── main.ts             # Ponto de entrada, ValidationPipe global e Swagger
+│   └── seeding.ts          # Script de população inicial do banco de dados
+├── test/                   # Testes automatizados (unitários e E2E)
+├── .env                    # Variáveis de ambiente locais (ignorado pelo Git)
+├── .env.exemplo            # Modelo de variáveis de ambiente necessárias
+└── package.json            # Dependências e scripts do projeto
