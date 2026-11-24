@@ -8,12 +8,15 @@ Esta documentação descreve a estrutura, o conteúdo, as ferramentas e o guia d
 
 Nesta aplicação, foram implementadas e aprimoradas as seguintes funcionalidades e conceitos:
 
-* **Arquitetura Modular em NestJS**: Organização do código em módulos (`AlunosModule`), controladores (`AlunosController`), serviços (`AlunosService`) e esquemas de dados (`AlunoSchema`).
-* **Configuração e Validação de Variáveis de Ambiente**:
-  * Gerenciamento centralizado de variáveis de ambiente com `@nestjs/config` (`ConfigModule`) e esquema de validação em `src/config/env.config.ts`.
-  * Validação automática na inicialização da aplicação (*fail-fast*), garantindo que variáveis obrigatórias (`DATABASE_URI` e `JWT_SECRET`) estejam definidas e que `NODE_ENV` aceite apenas valores válidos (`development`, `production` ou `test`).
+* **Arquitetura Modular em NestJS**: Organização do código em módulos (`AlunosModule`), controladores (`AlunosController`), serviços (`AlunosService`), DTOs e esquemas de dados (`AlunoSchema`).
+* **Configuração Modularizada e Validação de Variáveis de Ambiente**:
+  * Gerenciamento centralizado de variáveis de ambiente com `@nestjs/config` (`ConfigModule.forRoot({ isGlobal: true })`), tipagem estrita via interface `variaveisDeAmbiente` (`src/config/env.config.ts`) e inferência de tipos (`infer: true`) no `ConfigService` injetado nos serviços (`AlunosService`).
+  * **Namespaces de Configuração (`registerAs`)**: Separação das configurações por domínio em arquivos dedicados (`src/config/database.config.ts` e `src/config/auth.config.ts`), registrados globalmente no `AppModule` via `load: [databaseConfig, authConfig]` e injetados de forma tipada nos serviços (como no `AlunosService`) utilizando `@Inject(databaseConfig.KEY)` e `ConfigType<typeof databaseConfig>`.
+  * **Validação com Joi (`validationSchema`)**: Validação automática na inicialização da aplicação (*fail-fast*) utilizando **Joi**, garantindo que variáveis obrigatórias (`DATABASE_URI` e `JWT_SECRET`) estejam definidas, aplicando valores padrão (`NODE_ENV` como `development` e `PORT` como `3000`) e restringindo os ambientes aceitos.
   * Disponibilização de arquivo modelo `.env.exemplo` para facilitar a configuração em novos ambientes.
-* **Persistência de Dados com MongoDB**: Conexão dinâmica à base de dados NoSQL utilizando `@nestjs/mongoose` com `MongooseModule.forRootAsync` (lendo `DATABASE_URI` do ambiente) e manipulação de documentos via Mongoose (`escola_dbn` / collection `alunos`).
+* **Persistência de Dados e Pool de Conexões com MongoDB**:
+  * Conexão dinâmica e assíncrona à base de dados NoSQL utilizando `@nestjs/mongoose` com `MongooseModule.forRootAsync`, injetando a configuração tipada do banco (`databaseConfig`).
+  * Configuração e monitoramento do **Pool de Conexões** (`maxPoolSize` configurável via variável de ambiente `MAX_POOL_SIZE`, com padrão `10`) e manipulação de documentos via Mongoose (`escola_dbn` / collection `alunos`).
 * **Operações CRUD Completas**: 
   * `POST /alunos`: Criar um novo registo de aluno.
   * `GET /alunos`: Listar alunos com suporte a paginação, filtros opcionais e ordenação.
@@ -53,7 +56,8 @@ Nesta aplicação, foram implementadas e aprimoradas as seguintes funcionalidade
 
 * **[Node.js](https://nodejs.org/)** & **[TypeScript](https://www.typescriptlang.org/)**: Base de execução e linguagem tipada do projeto.
 * **[NestJS](https://nestjs.com/)**: Framework backend progressivo e modular (`@nestjs/common`, `@nestjs/core`, `@nestjs/config`).
-* **[MongoDB](https://www.mongodb.com/) & Mongoose**: Banco de dados NoSQL e ODM para modelagem de dados (`timestamps`, índices únicos) e tratamento de `MongoServerError`.
+* **[Joi](https://joi.dev/)**: Biblioteca de validação de esquemas utilizada na validação das variáveis de ambiente (`validationSchema`).
+* **[MongoDB](https://www.mongodb.com/) & Mongoose**: Banco de dados NoSQL e ODM para modelagem de dados (`timestamps`, índices únicos, `maxPoolSize`) e tratamento de `MongoServerError`.
 * **[Faker.js](https://fakerjs.dev/) (`@faker-js/faker`) & [tsx](https://tsx.is/)**: Geração de massa de dados realista em português e execução direta de scripts TypeScript.
 * **[Swagger / OpenAPI](https://swagger.io/)**: Documentação interativa e testes diretos dos endpoints da API (`@nestjs/swagger`).
 * **Class-Validator & Class-Transformer**: Validação e transformação declarativa de requisições.
@@ -63,18 +67,12 @@ Nesta aplicação, foram implementadas e aprimoradas as seguintes funcionalidade
 
 ---
 
-## 📂 Estrutura do Projeto
+## 🚀 Como Executar o Projeto
 
-```text
-escola-api/
-├── src/
-│   ├── alunos/             # Módulo, controller, service, DTOs e schema de alunos
-│   ├── config/
-│   │   └── env.config.ts   # Validação e tipagem das variáveis de ambiente
-│   ├── app.module.ts       # Módulo raiz da aplicação
-│   ├── main.ts             # Ponto de entrada, ValidationPipe global e Swagger
-│   └── seeding.ts          # Script de população inicial do banco de dados
-├── test/                   # Testes automatizados (unitários e E2E)
-├── .env                    # Variáveis de ambiente locais (ignorado pelo Git)
-├── .env.exemplo            # Modelo de variáveis de ambiente necessárias
-└── package.json            # Dependências e scripts do projeto
+### 1. Pré-requisitos
+* **Node.js** e **npm** instalados na máquina.
+* Instância do **MongoDB** ativa (ex.: local em `mongodb://localhost:27017/escola_dbn`).
+
+### 2. Instalação das dependências
+```bash
+npm install
